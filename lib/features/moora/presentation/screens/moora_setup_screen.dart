@@ -19,6 +19,29 @@ class _MooraSetupScreenState extends ConsumerState<MooraSetupScreen> {
   bool _initialized = false;
 
   @override
+  void initState() {
+    super.initState();
+    // addPostFrameCallback = "jalankan ini SETELAH frame pertama selesai digambar"
+    // Ini satu-satunya cara aman untuk modifikasi provider dari lifecycle widget
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initWeights();
+    });
+  }
+
+  void _initWeights() {
+    if (_initialized) return;
+
+    final criteriasAsync = ref.read(criteriasProvider);
+    final savedWeightsAsync = ref.read(savedWeightsProvider);
+
+    criteriasAsync.whenData((criterias) {
+      final saved = savedWeightsAsync.valueOrNull ?? {};
+      ref.read(weightNotifierProvider.notifier).setFromSaved(saved, criterias);
+      _initialized = true;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final criteriasAsync = ref.watch(criteriasProvider);
     final savedWeightsAsync = ref.watch(savedWeightsProvider);
@@ -27,6 +50,20 @@ class _MooraSetupScreenState extends ConsumerState<MooraSetupScreen> {
     final internshipsAsync = ref.watch(internshipsProvider);
     final selectedInternships = ref.watch(selectedInternshipsProvider);
     final selectedNotifier = ref.read(selectedInternshipsProvider.notifier);
+
+    // Ketika data criteria baru selesai load, init weights
+    // Tapi hanya dari listener, BUKAN dari dalam build langsung
+    ref.listen(criteriasProvider, (prev, next) {
+      next.whenData((criterias) {
+        if (!_initialized) {
+          final saved = ref.read(savedWeightsProvider).valueOrNull ?? {};
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            weightNotifier.setFromSaved(saved, criterias);
+            _initialized = true;
+          });
+        }
+      });
+    });
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -38,23 +75,12 @@ class _MooraSetupScreenState extends ConsumerState<MooraSetupScreen> {
         error: (err, _) => ErrorWidget2(
           message: err.toString(),
           onRetry: () {
+            _initialized = false;
             ref.invalidate(criteriasProvider);
             ref.invalidate(savedWeightsProvider);
           },
         ),
         data: (criterias) {
-          // Init weights sekali dari saved data
-          if (!_initialized) {
-            savedWeightsAsync.whenData((saved) {
-              weightNotifier.setFromSaved(saved, criterias);
-              _initialized = true;
-            });
-            if (savedWeightsAsync.hasError && !_initialized) {
-              weightNotifier.setFromSaved({}, criterias);
-              _initialized = true;
-            }
-          }
-
           final total = weightNotifier.total;
           final isValid = weightNotifier.isValid;
 
@@ -99,22 +125,31 @@ class _MooraSetupScreenState extends ConsumerState<MooraSetupScreen> {
                       // ── Bagian 1: Bobot Kriteria
                       _SectionHeader(
                         title: 'Bobot Kriteria',
-                        subtitle: 'Atur persentase bobot tiap kriteria (total harus 100%)',
+                        subtitle:
+                            'Atur persentase bobot tiap kriteria (total harus 100%)',
                       ),
                       const SizedBox(height: 12),
-                      ...criterias.map((c) => _CriteriaWeightCard(
-                            criteria: c,
-                            weight: weights[c.id.toString()] ?? 0,
-                            onChanged: (v) =>
-                                weightNotifier.updateWeight(c.id.toString(), v),
-                          )),
+
+                      if (savedWeightsAsync.isLoading)
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 8),
+                          child: LoadingWidget(message: 'Memuat bobot tersimpan...'),
+                        )
+                      else
+                        ...criterias.map((c) => _CriteriaWeightCard(
+                              criteria: c,
+                              weight: weights[c.id.toString()] ?? 0,
+                              onChanged: (v) =>
+                                  weightNotifier.updateWeight(c.id.toString(), v),
+                            )),
 
                       const SizedBox(height: 24),
 
                       // ── Bagian 2: Pilih Internship
                       _SectionHeader(
                         title: 'Pilih Tempat Magang',
-                        subtitle: 'Pilih yang ingin dibandingkan (minimal 1)',
+                        subtitle:
+                            'Pilih yang ingin dibandingkan (minimal 1)',
                       ),
                       const SizedBox(height: 12),
                       internshipsAsync.when(
@@ -127,14 +162,15 @@ class _MooraSetupScreenState extends ConsumerState<MooraSetupScreen> {
                                     name: i.name,
                                     city: i.city,
                                     category: i.category?.name,
-                                    isSelected: selectedNotifier.isSelected(i.id),
+                                    isSelected:
+                                        selectedNotifier.isSelected(i.id),
                                     onToggle: () => selectedNotifier.toggle(i),
                                   ))
                               .toList(),
                         ),
                       ),
 
-                      const SizedBox(height: 100), // space for FAB
+                      const SizedBox(height: 100),
                     ],
                   ),
                 ),
@@ -144,10 +180,10 @@ class _MooraSetupScreenState extends ConsumerState<MooraSetupScreen> {
         },
       ),
 
-      // ── FAB Lanjut
       floatingActionButton: criteriasAsync.whenOrNull(
-        data: (criterias) {
-          final isWeightValid = ref.watch(weightNotifierProvider.notifier).isValid;
+        data: (_) {
+          final isWeightValid =
+              ref.watch(weightNotifierProvider.notifier).isValid;
           final hasInternships = selectedInternships.isNotEmpty;
           final canProceed = isWeightValid && hasInternships;
 
@@ -155,20 +191,15 @@ class _MooraSetupScreenState extends ConsumerState<MooraSetupScreen> {
             onPressed: canProceed
                 ? () => context.go('/moora/scoring')
                 : () {
-                    String msg = '';
-                    if (!isWeightValid) {
-                      msg = 'Total bobot harus tepat 100%';
-                    } else {
-                      msg = 'Pilih minimal 1 tempat magang';
-                    }
+                    final msg = !isWeightValid
+                        ? 'Total bobot harus tepat 100%'
+                        : 'Pilih minimal 1 tempat magang';
                     AppSnackBar.showError(context, msg);
                   },
             backgroundColor:
                 canProceed ? AppColors.primary : AppColors.textHint,
             icon: const Icon(Icons.arrow_forward),
-            label: Text(
-              'Lanjut Scoring (${selectedInternships.length})',
-            ),
+            label: Text('Lanjut Scoring (${selectedInternships.length})'),
           );
         },
       ),
@@ -194,6 +225,7 @@ class _CriteriaWeightCard extends StatefulWidget {
 
 class _CriteriaWeightCardState extends State<_CriteriaWeightCard> {
   late TextEditingController _ctrl;
+  bool _hasFocus = false;
 
   @override
   void initState() {
@@ -206,9 +238,7 @@ class _CriteriaWeightCardState extends State<_CriteriaWeightCard> {
   @override
   void didUpdateWidget(_CriteriaWeightCard old) {
     super.didUpdateWidget(old);
-    // Sync dari luar hanya jika tidak sedang focus
-    final focusNode = FocusScope.of(context);
-    if (!focusNode.hasFocus) {
+    if (!_hasFocus) {
       final newText =
           widget.weight == 0 ? '' : widget.weight.toStringAsFixed(0);
       if (_ctrl.text != newText) _ctrl.text = newText;
@@ -234,7 +264,6 @@ class _CriteriaWeightCardState extends State<_CriteriaWeightCard> {
           children: [
             Row(
               children: [
-                // Code badge
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -256,12 +285,9 @@ class _CriteriaWeightCardState extends State<_CriteriaWeightCard> {
                   child: Text(
                     widget.criteria.name,
                     style: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 13,
-                    ),
+                        fontWeight: FontWeight.w600, fontSize: 13),
                   ),
                 ),
-                // Benefit/Cost badge
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
@@ -283,8 +309,6 @@ class _CriteriaWeightCardState extends State<_CriteriaWeightCard> {
               ],
             ),
             const SizedBox(height: 10),
-
-            // Slider + input
             Row(
               children: [
                 Expanded(
@@ -297,35 +321,43 @@ class _CriteriaWeightCardState extends State<_CriteriaWeightCard> {
                     inactiveColor: AppColors.divider,
                     onChanged: (v) {
                       widget.onChanged(v);
-                      _ctrl.text = v.toStringAsFixed(0);
+                      if (!_hasFocus) {
+                        _ctrl.text = v.toStringAsFixed(0);
+                      }
                     },
                   ),
                 ),
                 const SizedBox(width: 8),
                 SizedBox(
                   width: 60,
-                  child: TextField(
-                    controller: _ctrl,
-                    keyboardType: TextInputType.number,
-                    textAlign: TextAlign.center,
-                    style:
-                        const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-                    decoration: InputDecoration(
-                      suffixText: '%',
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 8),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide:
-                            const BorderSide(color: AppColors.divider),
+                  child: Focus(
+                    onFocusChange: (hasFocus) =>
+                        setState(() => _hasFocus = hasFocus),
+                    child: TextField(
+                      controller: _ctrl,
+                      keyboardType: TextInputType.number,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                          fontSize: 14, fontWeight: FontWeight.w600),
+                      decoration: InputDecoration(
+                        suffixText: '%',
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 8),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide:
+                              const BorderSide(color: AppColors.divider),
+                        ),
                       ),
+                      onChanged: (v) {
+                        final parsed = double.tryParse(v);
+                        if (parsed != null &&
+                            parsed >= 0 &&
+                            parsed <= 100) {
+                          widget.onChanged(parsed);
+                        }
+                      },
                     ),
-                    onChanged: (v) {
-                      final parsed = double.tryParse(v);
-                      if (parsed != null && parsed >= 0 && parsed <= 100) {
-                        widget.onChanged(parsed);
-                      }
-                    },
                   ),
                 ),
               ],
@@ -365,13 +397,14 @@ class _InternshipCheckCard extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: isSelected ? AppColors.primary : Colors.transparent,
+              color:
+                  isSelected ? AppColors.primary : Colors.transparent,
               width: 2,
             ),
           ),
           child: Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            padding: const EdgeInsets.symmetric(
+                horizontal: 14, vertical: 12),
             child: Row(
               children: [
                 AnimatedContainer(
@@ -380,10 +413,13 @@ class _InternshipCheckCard extends StatelessWidget {
                   height: 22,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: isSelected ? AppColors.primary : Colors.transparent,
+                    color: isSelected
+                        ? AppColors.primary
+                        : Colors.transparent,
                     border: Border.all(
-                      color:
-                          isSelected ? AppColors.primary : AppColors.textHint,
+                      color: isSelected
+                          ? AppColors.primary
+                          : AppColors.textHint,
                       width: 2,
                     ),
                   ),
@@ -409,9 +445,12 @@ class _InternshipCheckCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        category != null ? '$city • $category' : city,
+                        category != null
+                            ? '$city • $category'
+                            : city,
                         style: const TextStyle(
-                            fontSize: 11, color: AppColors.textSecondary),
+                            fontSize: 11,
+                            color: AppColors.textSecondary),
                       ),
                     ],
                   ),
@@ -430,7 +469,8 @@ class _SectionHeader extends StatelessWidget {
   final String title;
   final String subtitle;
 
-  const _SectionHeader({required this.title, required this.subtitle});
+  const _SectionHeader(
+      {required this.title, required this.subtitle});
 
   @override
   Widget build(BuildContext context) {
