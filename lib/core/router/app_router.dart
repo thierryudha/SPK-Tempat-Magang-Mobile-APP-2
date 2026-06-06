@@ -10,6 +10,8 @@ import '../../features/moora/presentation/screens/moora_setup_screen.dart';
 import '../../features/moora/presentation/screens/moora_scoring_screen.dart';
 import '../../features/moora/presentation/screens/moora_result_screen.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
+import '../../features/profile/presentation/screens/edit_profile_screen.dart';
+import '../../features/profile/presentation/screens/change_password_screen.dart';
 import '../storage/secure_storage_service.dart';
 
 class AppRouter {
@@ -68,6 +70,16 @@ class AppRouter {
       GoRoute(
         path: '/profile',
         builder: (_, __) => const ProfileScreen(),
+        routes: [
+          GoRoute(
+            path: 'edit',
+            builder: (_, __) => const EditProfileScreen(),
+          ),
+          GoRoute(
+            path: 'change-password',
+            builder: (_, __) => const ChangePasswordScreen(),
+          ),
+        ],
       ),
     ],
   );

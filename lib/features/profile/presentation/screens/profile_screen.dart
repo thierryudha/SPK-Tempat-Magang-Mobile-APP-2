@@ -177,6 +177,28 @@ class ProfileScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 24),
 
+                      // Aksi Profil
+                      Card(
+                        child: Column(
+                          children: [
+                            ListTile(
+                              leading: const Icon(Icons.edit_outlined, color: AppColors.primary),
+                              title: const Text('Edit Profil'),
+                              trailing: const Icon(Icons.chevron_right),
+                              onTap: () => context.push('/profile/edit'),
+                            ),
+                            const Divider(height: 1),
+                            ListTile(
+                              leading: const Icon(Icons.lock_outline, color: AppColors.primary),
+                              title: const Text('Ubah Password'),
+                              trailing: const Icon(Icons.chevron_right),
+                              onTap: () => context.push('/profile/change-password'),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+
                       // Logout
                       SizedBox(
                         width: double.infinity,

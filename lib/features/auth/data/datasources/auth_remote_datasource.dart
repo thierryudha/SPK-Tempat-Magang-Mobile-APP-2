@@ -65,6 +65,54 @@ class AuthRemoteDataSource {
     }
   }
 
+  Future<Map<String, dynamic>> updateProfile({
+    required String name,
+    required String email,
+    String? photoPath,
+  }) async {
+    try {
+      final formData = FormData.fromMap({
+        'name': name,
+        'email': email,
+      });
+
+      if (photoPath != null) {
+        formData.files.add(MapEntry(
+          'photo',
+          await MultipartFile.fromFile(photoPath),
+        ));
+      }
+
+      final response = await _dio.post(
+        ApiConstants.updateProfile,
+        data: formData,
+      );
+      return response.data as Map<String, dynamic>;
+    } on DioException catch (e) {
+      throw DioClient.extractException(e);
+    }
+  }
+
+  Future<Map<String, dynamic>> changePassword({
+    required String currentPassword,
+    required String password,
+    required String passwordConfirmation,
+  }) async {
+    try {
+      final response = await _dio.post(
+        ApiConstants.changePassword,
+        data: {
+          'current_password': currentPassword,
+          'password': password,
+          'password_confirmation': passwordConfirmation,
+        },
+      );
+      return response.data as Map<String, dynamic>;
+    } on DioException catch (e) {
+      throw DioClient.extractException(e);
+    }
+  }
+
   Future<void> logout() async {
     try {
       await _dio.post(ApiConstants.logout);

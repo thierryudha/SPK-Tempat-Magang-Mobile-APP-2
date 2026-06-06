@@ -34,6 +34,32 @@ class AuthRepository {
     return data['message'] as String;
   }
 
+  Future<UserModel> updateProfile({
+    required String name,
+    required String email,
+    String? photoPath,
+  }) async {
+    final data = await _dataSource.updateProfile(
+      name: name,
+      email: email,
+      photoPath: photoPath,
+    );
+    return UserModel.fromJson(data['user'] as Map<String, dynamic>);
+  }
+
+  Future<String> changePassword({
+    required String currentPassword,
+    required String password,
+    required String passwordConfirmation,
+  }) async {
+    final data = await _dataSource.changePassword(
+      currentPassword: currentPassword,
+      password: password,
+      passwordConfirmation: passwordConfirmation,
+    );
+    return data['message'] as String;
+  }
+
   Future<void> logout() async {
     try {
       await _dataSource.logout();

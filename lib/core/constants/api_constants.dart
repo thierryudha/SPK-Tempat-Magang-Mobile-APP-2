@@ -7,6 +7,8 @@ class ApiConstants {
   static const String login = '/login';
   static const String register = '/register';
   static const String forgotPassword = '/forgot-password';
+  static const String updateProfile = '/profile/update';
+  static const String changePassword = '/profile/change-password';
   static const String logout = '/logout';
   static const String me = '/me';
   static const String internships = '/internships';

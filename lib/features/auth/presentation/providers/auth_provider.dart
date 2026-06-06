@@ -43,6 +43,32 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
     return await ref.read(authRepositoryProvider).forgotPassword(email: email);
   }
 
+  Future<void> updateProfile({
+    required String name,
+    required String email,
+    String? photoPath,
+  }) async {
+    final updatedUser = await ref.read(authRepositoryProvider).updateProfile(
+          name: name,
+          email: email,
+          photoPath: photoPath,
+        );
+    // Langsung update state user yang sedang aktif
+    state = AsyncData(updatedUser);
+  }
+
+  Future<String> changePassword({
+    required String currentPassword,
+    required String password,
+    required String passwordConfirmation,
+  }) async {
+    return await ref.read(authRepositoryProvider).changePassword(
+          currentPassword: currentPassword,
+          password: password,
+          passwordConfirmation: passwordConfirmation,
+        );
+  }
+
   Future<void> logout() async {
     await ref.read(authRepositoryProvider).logout();
     state = const AsyncData(null);
