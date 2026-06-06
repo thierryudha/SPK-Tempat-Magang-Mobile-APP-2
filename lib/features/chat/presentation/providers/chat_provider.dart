@@ -17,7 +17,7 @@ class ChatNotifier extends StateNotifier<List<ChatMessage>> {
   final ChatService _chatService;
 
   ChatNotifier(this._chatService) : super([
-    ChatMessage(text: 'Halo! Ada yang bisa saya bantu terkait aplikasi ini?', isUser: false),
+    ChatMessage(text: 'Halo! Ada yang bisa MoPro Agent bantu terkait aplikasi ini?', isUser: false),
   ]);
 
   Future<void> sendMessage(String text) async {

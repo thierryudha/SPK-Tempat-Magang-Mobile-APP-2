@@ -82,7 +82,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                 ),
                 const SizedBox(height: 24),
                 const Text(
-                  'SPK Magang',
+                  'Moora Project',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 28,

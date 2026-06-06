@@ -41,7 +41,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Asisten (Gemini)'),
+        title: const Text('MoPro Agent'),
         backgroundColor: const Color(0xFF245B99),
         foregroundColor: Colors.white,
       ),

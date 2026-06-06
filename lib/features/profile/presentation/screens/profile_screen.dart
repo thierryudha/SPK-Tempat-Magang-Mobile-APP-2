@@ -169,7 +169,7 @@ class ProfileScreen extends ConsumerWidget {
                             _InfoTile(
                               icon: Icons.info_outline,
                               label: 'Aplikasi',
-                              value: 'SPK Magang - MOORA',
+                              value: 'Moora Project',
                             ),
                             const Divider(height: 1),
                             _InfoTile(

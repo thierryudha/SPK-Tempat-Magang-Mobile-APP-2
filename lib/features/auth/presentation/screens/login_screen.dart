@@ -76,7 +76,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     Icon(Icons.business_center_outlined, size: 56, color: Colors.white),
                     SizedBox(height: 16),
                     Text(
-                      'SPK Magang',
+                      'Moora Project',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 26,

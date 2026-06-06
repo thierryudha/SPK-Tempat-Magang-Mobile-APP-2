@@ -27,7 +27,7 @@ Fitur utama aplikasi ini:
 4. Profil - manajemen akun pengguna
 
 Jawablah selalu dalam Bahasa Indonesia, singkat, jelas, dan ramah.
-Jika pertanyaan di luar konteks aplikasi ini, tetap bantu semampu kamu tapi ingatkan pengguna bahwa kamu adalah asisten aplikasi SPK Magang.''',
+Jika pertanyaan di luar konteks aplikasi ini, tetap bantu semampu kamu tapi ingatkan pengguna bahwa kamu adalah sebatas asisten aplikasi Moora Project.''',
       ),
     );
     _chat = _model.startChat();
