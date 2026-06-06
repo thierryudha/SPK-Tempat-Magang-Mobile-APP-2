@@ -71,17 +71,20 @@ class AuthRemoteDataSource {
     String? photoPath,
   }) async {
     try {
-      final formData = FormData.fromMap({
+      final Map<String, dynamic> data = {
         'name': name,
         'email': email,
-      });
+      };
 
       if (photoPath != null) {
-        formData.files.add(MapEntry(
-          'photo',
-          await MultipartFile.fromFile(photoPath),
-        ));
+        String fileName = photoPath.split('/').last;
+        data['photo'] = await MultipartFile.fromFile(
+          photoPath,
+          filename: fileName,
+        );
       }
+
+      final formData = FormData.fromMap(data);
 
       final response = await _dio.post(
         ApiConstants.updateProfile,

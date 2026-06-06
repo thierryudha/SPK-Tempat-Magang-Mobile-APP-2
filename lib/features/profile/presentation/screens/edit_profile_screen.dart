@@ -112,9 +112,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                           radius: 50,
                           backgroundColor: AppColors.primaryLight.withOpacity(0.2),
                           backgroundImage: _selectedImage != null
-                              ? FileImage(_selectedImage!)
-                              : null,
-                          child: _selectedImage == null
+                              ? FileImage(_selectedImage!) as ImageProvider
+                              : (user?.photo != null
+                                  ? NetworkImage('http://10.0.2.2:8000/storage/${user!.photo}')
+                                  : null),
+                          child: (_selectedImage == null && user?.photo == null)
                               ? Text(
                                   user?.name.isNotEmpty == true
                                       ? user!.name[0].toUpperCase()
