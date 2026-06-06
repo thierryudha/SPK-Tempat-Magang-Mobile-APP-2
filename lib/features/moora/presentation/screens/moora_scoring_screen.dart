@@ -18,7 +18,10 @@ class _MooraScoringScreenState extends ConsumerState<MooraScoringScreen> {
   bool _isSubmitting = false;
 
   Future<void> _calculate() async {
-    final criterias = ref.read(criteriasProvider).valueOrNull ?? [];
+    final allCriterias = ref.read(criteriasProvider).valueOrNull ?? [];
+    final activeMap = ref.read(activeCriteriaProvider);
+    final criterias = allCriterias.where((c) => activeMap[c.id.toString()] ?? true).toList();
+    
     final weights = ref.read(weightNotifierProvider);
     final internships = ref.read(selectedInternshipsProvider);
     final scores = ref.read(scoresNotifierProvider);
@@ -34,7 +37,7 @@ class _MooraScoringScreenState extends ConsumerState<MooraScoringScreen> {
 
     try {
       final payload = CalculateRequestModel(
-        criteria: {for (final c in criterias) c.id.toString(): true},
+        criteria: {for (final c in allCriterias) c.id.toString(): activeMap[c.id.toString()] ?? true},
         weights: weights,
         internships: internships.map((i) => i.id).toList(),
         scores: scores,
@@ -73,7 +76,10 @@ class _MooraScoringScreenState extends ConsumerState<MooraScoringScreen> {
       body: criteriasAsync.when(
         loading: () => const LoadingWidget(),
         error: (err, _) => ErrorWidget2(message: err.toString()),
-        data: (criterias) {
+        data: (allCriterias) {
+          final activeMap = ref.watch(activeCriteriaProvider);
+          final criterias = allCriterias.where((c) => activeMap[c.id.toString()] ?? true).toList();
+
           if (internships.isEmpty) {
             return const EmptyWidget(
               message: 'Tidak ada tempat magang yang dipilih.\nKembali ke Setup.',

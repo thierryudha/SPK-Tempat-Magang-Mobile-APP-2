@@ -42,6 +42,28 @@ final weightNotifierProvider =
   (ref) => WeightNotifier(),
 );
 
+// ─── Active Criterias (keyed by criteria_id string) ──────────
+class ActiveCriteriaNotifier extends StateNotifier<Map<String, bool>> {
+  ActiveCriteriaNotifier() : super({});
+
+  void setInitial(List<CriteriaModel> criterias) {
+    final initial = <String, bool>{};
+    for (final c in criterias) {
+      initial[c.id.toString()] = true; // default all true
+    }
+    state = initial;
+  }
+
+  void toggle(String criteriaId, bool isActive) {
+    state = {...state, criteriaId: isActive};
+  }
+}
+
+final activeCriteriaProvider =
+    StateNotifierProvider<ActiveCriteriaNotifier, Map<String, bool>>(
+  (ref) => ActiveCriteriaNotifier(),
+);
+
 // ─── Selected internships for comparison ─────────────────────
 class SelectedInternshipsNotifier extends StateNotifier<List<InternshipModel>> {
   SelectedInternshipsNotifier() : super([]);

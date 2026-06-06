@@ -37,6 +37,7 @@ class _MooraSetupScreenState extends ConsumerState<MooraSetupScreen> {
     criteriasAsync.whenData((criterias) {
       final saved = savedWeightsAsync.valueOrNull ?? {};
       ref.read(weightNotifierProvider.notifier).setFromSaved(saved, criterias);
+      ref.read(activeCriteriaProvider.notifier).setInitial(criterias);
       _initialized = true;
     });
   }
@@ -59,6 +60,7 @@ class _MooraSetupScreenState extends ConsumerState<MooraSetupScreen> {
           final saved = ref.read(savedWeightsProvider).valueOrNull ?? {};
           WidgetsBinding.instance.addPostFrameCallback((_) {
             weightNotifier.setFromSaved(saved, criterias);
+            ref.read(activeCriteriaProvider.notifier).setInitial(criterias);
             _initialized = true;
           });
         }
@@ -136,12 +138,23 @@ class _MooraSetupScreenState extends ConsumerState<MooraSetupScreen> {
                           child: LoadingWidget(message: 'Memuat bobot tersimpan...'),
                         )
                       else
-                        ...criterias.map((c) => _CriteriaWeightCard(
-                              criteria: c,
-                              weight: weights[c.id.toString()] ?? 0,
-                              onChanged: (v) =>
-                                  weightNotifier.updateWeight(c.id.toString(), v),
-                            )),
+                        ...criterias.map((c) {
+                          final isActive = ref.watch(activeCriteriaProvider)[c.id.toString()] ?? true;
+                          return _CriteriaWeightCard(
+                            criteria: c,
+                            weight: weights[c.id.toString()] ?? 0,
+                            isActive: isActive,
+                            onToggle: (v) {
+                              ref.read(activeCriteriaProvider.notifier).toggle(c.id.toString(), v);
+                              if (!v) {
+                                // Reset weight to 0 if disabled
+                                weightNotifier.updateWeight(c.id.toString(), 0);
+                              }
+                            },
+                            onChanged: (v) =>
+                                weightNotifier.updateWeight(c.id.toString(), v),
+                          );
+                        }),
 
                       const SizedBox(height: 24),
 
@@ -211,11 +224,15 @@ class _MooraSetupScreenState extends ConsumerState<MooraSetupScreen> {
 class _CriteriaWeightCard extends StatefulWidget {
   final CriteriaModel criteria;
   final double weight;
+  final bool isActive;
+  final ValueChanged<bool> onToggle;
   final ValueChanged<double> onChanged;
 
   const _CriteriaWeightCard({
     required this.criteria,
     required this.weight,
+    required this.isActive,
+    required this.onToggle,
     required this.onChanged,
   });
 
@@ -264,6 +281,17 @@ class _CriteriaWeightCardState extends State<_CriteriaWeightCard> {
           children: [
             Row(
               children: [
+                Switch(
+                  value: widget.isActive,
+                  onChanged: widget.onToggle,
+                  activeColor: Colors.white,
+                  activeTrackColor: AppColors.accent,
+                  inactiveThumbColor: Colors.white,
+                  inactiveTrackColor: AppColors.textHint.withOpacity(0.5),
+                  trackOutlineColor: MaterialStateProperty.resolveWith(
+                    (states) => Colors.transparent,
+                  ),
+                ),
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -317,14 +345,16 @@ class _CriteriaWeightCardState extends State<_CriteriaWeightCard> {
                     min: 0,
                     max: 100,
                     divisions: 100,
-                    activeColor: AppColors.primary,
+                    activeColor: widget.isActive ? AppColors.primary : AppColors.divider,
                     inactiveColor: AppColors.divider,
-                    onChanged: (v) {
-                      widget.onChanged(v);
-                      if (!_hasFocus) {
-                        _ctrl.text = v.toStringAsFixed(0);
-                      }
-                    },
+                    onChanged: widget.isActive
+                        ? (v) {
+                            widget.onChanged(v);
+                            if (!_hasFocus) {
+                              _ctrl.text = v.toStringAsFixed(0);
+                            }
+                          }
+                        : null,
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -335,6 +365,7 @@ class _CriteriaWeightCardState extends State<_CriteriaWeightCard> {
                         setState(() => _hasFocus = hasFocus),
                     child: TextField(
                       controller: _ctrl,
+                      enabled: widget.isActive,
                       keyboardType: TextInputType.number,
                       textAlign: TextAlign.center,
                       style: const TextStyle(
@@ -349,14 +380,16 @@ class _CriteriaWeightCardState extends State<_CriteriaWeightCard> {
                               const BorderSide(color: AppColors.divider),
                         ),
                       ),
-                      onChanged: (v) {
-                        final parsed = double.tryParse(v);
-                        if (parsed != null &&
-                            parsed >= 0 &&
-                            parsed <= 100) {
-                          widget.onChanged(parsed);
-                        }
-                      },
+                      onChanged: widget.isActive
+                          ? (v) {
+                              final parsed = double.tryParse(v);
+                              if (parsed != null &&
+                                  parsed >= 0 &&
+                                  parsed <= 100) {
+                                widget.onChanged(parsed);
+                              }
+                            }
+                          : null,
                     ),
                   ),
                 ),
