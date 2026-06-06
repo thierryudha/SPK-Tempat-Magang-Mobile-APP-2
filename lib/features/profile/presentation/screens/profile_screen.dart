@@ -32,8 +32,13 @@ class ProfileScreen extends ConsumerWidget {
 
     if (confirmed != true) return;
 
-    await ref.read(authProvider.notifier).logout();
-    if (context.mounted) context.go('/login');
+    try {
+      await ref.read(authProvider.notifier).logout();
+    } catch (e) {
+      // Abaikan error jaringan saat logout agar user tetap bisa keluar secara lokal
+    } finally {
+      if (context.mounted) context.go('/login');
+    }
   }
 
   @override
@@ -51,9 +56,6 @@ class ProfileScreen extends ConsumerWidget {
         ),
         data: (user) {
           if (user == null) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              context.go('/login');
-            });
             return const SizedBox();
           }
 

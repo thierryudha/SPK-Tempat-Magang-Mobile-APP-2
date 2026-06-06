@@ -92,7 +92,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Rekomendasi Tempat Magang\nMetode MOORA',
+                  'Rekomendasi Tempat Magang\nMahasiswa TIK',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.7),

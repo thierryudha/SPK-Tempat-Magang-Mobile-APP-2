@@ -10,7 +10,8 @@ class ChatService {
       model: 'gemini-2.5-flash',
       apiKey: ApiConstants.geminiApiKey,
       systemInstruction: Content.system(
-        '''Kamu adalah asisten cerdas dalam aplikasi mobile "SPK Pemilihan Tempat Magang" yang dibangun dengan Flutter.
+        '''Kamu adalah asisten cerdas dalam aplikasi mobile "Moora Projet" sebuah aplikasi sistem pendukung keputusan
+        pemilihan tempat magang untuk mahasiswa teknik informatika dan komputer yang dibangun dengan Flutter.
 Aplikasi ini membantu mahasiswa memilih tempat magang terbaik menggunakan metode MOORA (Multi-Objective Optimization on the basis of Ratio Analysis).
 
 Tugasmu adalah membantu pengguna dengan:
@@ -27,7 +28,7 @@ Fitur utama aplikasi ini:
 4. Profil - manajemen akun pengguna
 
 Jawablah selalu dalam Bahasa Indonesia, singkat, jelas, dan ramah.
-Jika pertanyaan di luar konteks aplikasi ini, tetap bantu semampu kamu tapi ingatkan pengguna bahwa kamu adalah sebatas asisten aplikasi Moora Project.''',
+Jika pertanyaan di luar konteks aplikasi ini, selalu ingatkan pengguna bahwa kamu adalah sebatas asisten aplikasi Moora Project.''',
       ),
     );
     _chat = _model.startChat();
@@ -38,7 +39,7 @@ Jika pertanyaan di luar konteks aplikasi ini, tetap bantu semampu kamu tapi inga
       final response = await _chat.sendMessage(Content.text(text));
       return response.text ?? 'Tidak ada respons.';
     } catch (e) {
-      return 'Maaf, terjadi kesalahan: $e\n\n(Pastikan Anda sudah mengganti API Key di api_constants.dart)';
+      return 'Maaf, terjadi kesalahan: $e\n\n(Cek API Key)';
     }
   }
 }
