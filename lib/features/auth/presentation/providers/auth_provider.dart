@@ -24,6 +24,25 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
     );
   }
 
+  Future<void> register({
+    required String name,
+    required String email,
+    required String password,
+    required String passwordConfirmation,
+  }) async {
+    // Kita tidak mengupdate state user di sini karena akan di-redirect ke login
+    await ref.read(authRepositoryProvider).register(
+          name: name,
+          email: email,
+          password: password,
+          passwordConfirmation: passwordConfirmation,
+        );
+  }
+
+  Future<String> forgotPassword({required String email}) async {
+    return await ref.read(authRepositoryProvider).forgotPassword(email: email);
+  }
+
   Future<void> logout() async {
     await ref.read(authRepositoryProvider).logout();
     state = const AsyncData(null);

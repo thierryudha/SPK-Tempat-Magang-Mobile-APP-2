@@ -26,6 +26,45 @@ class AuthRemoteDataSource {
     }
   }
 
+  Future<Map<String, dynamic>> register({
+    required String name,
+    required String email,
+    required String password,
+    required String passwordConfirmation,
+  }) async {
+    try {
+      final response = await _dio.post(
+        ApiConstants.register,
+        data: {
+          'name': name,
+          'email': email,
+          'password': password,
+          'password_confirmation': passwordConfirmation,
+          'device_name': 'flutter_app',
+        },
+      );
+      return response.data as Map<String, dynamic>;
+    } on DioException catch (e) {
+      throw DioClient.extractException(e);
+    }
+  }
+
+  Future<Map<String, dynamic>> forgotPassword({
+    required String email,
+  }) async {
+    try {
+      final response = await _dio.post(
+        ApiConstants.forgotPassword,
+        data: {
+          'email': email,
+        },
+      );
+      return response.data as Map<String, dynamic>;
+    } on DioException catch (e) {
+      throw DioClient.extractException(e);
+    }
+  }
+
   Future<void> logout() async {
     try {
       await _dio.post(ApiConstants.logout);

@@ -15,6 +15,25 @@ class AuthRepository {
     return UserModel.fromJson(data['user'] as Map<String, dynamic>);
   }
 
+  Future<void> register({
+    required String name,
+    required String email,
+    required String password,
+    required String passwordConfirmation,
+  }) async {
+    await _dataSource.register(
+      name: name,
+      email: email,
+      password: password,
+      passwordConfirmation: passwordConfirmation,
+    );
+  }
+
+  Future<String> forgotPassword({required String email}) async {
+    final data = await _dataSource.forgotPassword(email: email);
+    return data['message'] as String;
+  }
+
   Future<void> logout() async {
     try {
       await _dataSource.logout();

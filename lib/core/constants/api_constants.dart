@@ -5,6 +5,8 @@ class ApiConstants {
   static const String baseUrl = 'http://10.0.2.2:8000/api';
 
   static const String login = '/login';
+  static const String register = '/register';
+  static const String forgotPassword = '/forgot-password';
   static const String logout = '/logout';
   static const String me = '/me';
   static const String internships = '/internships';

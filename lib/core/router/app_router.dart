@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
+import '../../features/auth/presentation/screens/register_screen.dart';
+import '../../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../../features/auth/presentation/screens/splash_screen.dart';
 import '../../features/internship/presentation/screens/internship_list_screen.dart';
 import '../../features/internship/presentation/screens/internship_detail_screen.dart';
@@ -24,6 +26,14 @@ class AppRouter {
       GoRoute(
         path: '/login',
         builder: (_, __) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: '/register',
+        builder: (_, __) => const RegisterScreen(),
+      ),
+      GoRoute(
+        path: '/forgot-password',
+        builder: (_, __) => const ForgotPasswordScreen(),
       ),
       GoRoute(
         path: '/home',
@@ -62,14 +72,14 @@ class AppRouter {
     ],
   );
 
-  static final _publicRoutes = {'/splash', '/login'};
+  static final _publicRoutes = {'/splash', '/login', '/register', '/forgot-password'};
 
   static Future<String?> _guard(BuildContext context, GoRouterState state) async {
     final isPublic = _publicRoutes.contains(state.matchedLocation);
     final hasToken = await SecureStorageService.hasToken();
 
     if (!hasToken && !isPublic) return '/login';
-    if (hasToken && state.matchedLocation == '/login') return '/home';
+    if (hasToken && isPublic && state.matchedLocation != '/splash') return '/home';
     return null;
   }
 }
