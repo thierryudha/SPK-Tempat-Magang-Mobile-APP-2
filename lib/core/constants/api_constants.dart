@@ -1,3 +1,5 @@
+import 'api_secrets.dart';
+
 class ApiConstants {
   ApiConstants._();
 
@@ -15,4 +17,9 @@ class ApiConstants {
   static const String criterias = '/criterias';
   static const String weights = '/weights';
   static const String calculate = '/calculate';
+
+  // Gemini API Key — disimpan di api_secrets.dart (tidak di-commit ke git)
+  // Lihat api_secrets.example.dart untuk template
+  static const String geminiApiKey = ApiSecrets.geminiApiKey;
 }
+
