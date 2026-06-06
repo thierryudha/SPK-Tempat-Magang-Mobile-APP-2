@@ -320,60 +320,62 @@ class _CriteriaScoringRow extends StatelessWidget {
           ),
         ),
 
-        // Score buttons 1-5
+        // Dropdown Score Selection
         Padding(
           padding: const EdgeInsets.fromLTRB(14, 4, 14, 12),
-          child: Row(
-            children: List.generate(5, (i) {
-              final score = i + 1;
-              final isSelected = selectedScore == score;
-
-              // Cari deskripsi skala jika ada
-              final scale = criteria.scales.isNotEmpty
-                  ? criteria.scales.firstWhere((s) => s.score == score,
-                      orElse: () => criteria.scales.first)
-                  : null;
-
-              return Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 4),
-                  child: Tooltip(
-                    message: scale?.description ?? 'Skor $score',
-                    child: GestureDetector(
-                      onTap: () => onScoreSelected(score),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 150),
-                        height: 36,
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? AppColors.primary
-                              : AppColors.background,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: isSelected
-                                ? AppColors.primary
-                                : AppColors.divider,
-                            width: isSelected ? 2 : 1,
-                          ),
-                        ),
-                        child: Center(
-                          child: Text(
-                            '$score',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w700,
-                              color: isSelected
-                                  ? Colors.white
-                                  : AppColors.textSecondary,
-                            ),
-                          ),
-                        ),
+          child: DropdownButtonFormField<int>(
+            value: selectedScore,
+            hint: const Text(
+              'Pilih Skor Nilai...',
+              style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+            ),
+            isExpanded: true,
+            icon: const Icon(Icons.arrow_drop_down, color: AppColors.primary),
+            decoration: InputDecoration(
+              isDense: true,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              filled: true,
+              fillColor: AppColors.background,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(color: AppColors.divider),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(color: AppColors.divider),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+              ),
+            ),
+            items: criteria.scales.isNotEmpty
+                ? criteria.scales.map((scale) {
+                    return DropdownMenuItem<int>(
+                      value: scale.score,
+                      child: Text(
+                        scale.description,
+                        style: const TextStyle(fontSize: 13, color: AppColors.textPrimary),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                  ),
-                ),
-              );
-            }),
+                    );
+                  }).toList()
+                : List.generate(5, (i) {
+                    final score = i + 1;
+                    return DropdownMenuItem<int>(
+                      value: score,
+                      child: Text(
+                        'Skor $score',
+                        style: const TextStyle(fontSize: 13, color: AppColors.textPrimary),
+                      ),
+                    );
+                  }),
+            onChanged: (value) {
+              if (value != null) {
+                onScoreSelected(value);
+              }
+            },
           ),
         ),
       ],
