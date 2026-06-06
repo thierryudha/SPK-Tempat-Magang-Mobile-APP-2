@@ -24,11 +24,14 @@ class _AppShell extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: child,
-      floatingActionButton: FloatingActionButton(
-        heroTag: 'globalChatBtn',
-        backgroundColor: Colors.teal,
-        onPressed: () => context.push('/chat'),
-        child: const Icon(Icons.chat_bubble, color: Colors.white),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 70.0),
+        child: FloatingActionButton(
+          heroTag: 'globalChatBtn',
+          backgroundColor: const Color(0xFF1D4880),
+          onPressed: () => context.push('/chat'),
+          child: const Icon(Icons.chat_bubble, color: Colors.white),
+        ),
       ),
     );
   }
