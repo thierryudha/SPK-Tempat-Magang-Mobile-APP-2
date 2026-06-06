@@ -41,7 +41,7 @@ class CriteriaModel {
   bool get isBenefit => type == 'benefit';
 
   factory CriteriaModel.fromJson(Map<String, dynamic> json) {
-    final scalesRaw = json['criteria_scales'] as List<dynamic>? ?? [];
+    final scalesRaw = json['scales'] as List<dynamic>? ?? [];
     return CriteriaModel(
       id: json['id'] as int,
       code: json['code'] as String,
