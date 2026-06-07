@@ -319,7 +319,7 @@ class DashboardScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'STRATEGIC INSIGHT',
+                  'A GLIMPSE OF WISDOM',
                   style: TextStyle(color: Colors.white70, fontSize: 14, fontWeight: FontWeight.w800, letterSpacing: 1),
                 ),
                 const SizedBox(height: 12),
