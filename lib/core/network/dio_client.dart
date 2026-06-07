@@ -51,7 +51,7 @@ class DioClient {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.receiveTimeout:
       case DioExceptionType.sendTimeout:
-        return const NetworkException(message: 'Koneksi timeout. Periksa jaringan.');
+        return const NetworkException(message: 'Yah, gagal connect. Coba periksa jaringan.');
       case DioExceptionType.badResponse:
         final statusCode = error.response?.statusCode;
         final data = error.response?.data;
