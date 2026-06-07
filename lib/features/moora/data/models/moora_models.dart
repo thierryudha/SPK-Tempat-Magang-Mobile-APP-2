@@ -128,15 +128,32 @@ class CalculateRequestModel {
     required this.scores,
   });
 
-  Map<String, dynamic> toJson() => {
-        'criteria': criteria,
-        'weights': weights.map((k, v) => MapEntry(k, v)),
-        'internships': internships,
-        'scores': scores.map(
-          (internshipId, criteriaMap) => MapEntry(
-            internshipId,
-            criteriaMap.map((cId, score) => MapEntry(cId, score)),
-          ),
+  Map<String, dynamic> toJson() {
+    // Hanya kirim kriteria yang aktif (criteria[key] == true)
+    // agar tidak memicu validasi Laravel untuk bobot 0 (nonaktif)
+    final activeKeys = criteria.entries
+        .where((e) => e.value == true)
+        .map((e) => e.key)
+        .toSet();
+
+    final filteredWeights = Map.fromEntries(
+      weights.entries.where((e) => activeKeys.contains(e.key)),
+    );
+
+    final filteredScores = scores.map(
+      (internshipId, criteriaMap) => MapEntry(
+        internshipId,
+        Map.fromEntries(
+          criteriaMap.entries.where((e) => activeKeys.contains(e.key)),
         ),
-      };
+      ),
+    );
+
+    return {
+      'criteria': {for (final k in activeKeys) k: true},
+      'weights': filteredWeights,
+      'internships': internships,
+      'scores': filteredScores,
+    };
+  }
 }
