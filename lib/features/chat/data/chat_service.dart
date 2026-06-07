@@ -7,7 +7,7 @@ class ChatService {
 
   ChatService() {
     _model = GenerativeModel(
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3.5-flash',
       apiKey: ApiConstants.geminiApiKey,
       systemInstruction: Content.system(
         '''Kamu adalah asisten cerdas dalam aplikasi mobile "Moora Project" sebuah aplikasi sistem pendukung keputusan
