@@ -68,7 +68,7 @@ class InternshipDetailScreen extends ConsumerWidget {
                 actions: [
                   IconButton(
                     icon: const Icon(Icons.edit, color: Colors.white),
-                    onPressed: () => context.go('/home/internships/edit/${internship.id}'),
+                    onPressed: () => context.push('/internships/edit/${internship.id}'),
                   ),
                   IconButton(
                     icon: const Icon(Icons.delete, color: Colors.white),

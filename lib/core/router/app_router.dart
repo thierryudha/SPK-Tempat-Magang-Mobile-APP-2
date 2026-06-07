@@ -14,19 +14,36 @@ import '../../features/profile/presentation/screens/profile_screen.dart';
 import '../../features/profile/presentation/screens/edit_profile_screen.dart';
 import '../../features/profile/presentation/screens/change_password_screen.dart';
 import '../../features/chat/presentation/screens/chat_screen.dart';
+import '../../features/dashboard/presentation/screens/dashboard_screen.dart';
 import '../storage/secure_storage_service.dart';
 
-// Shell widget: membungkus semua halaman yang butuh floating button chatbot
+// Shell widget: membungkus halaman dengan BottomNavigationBar & FAB chatbot
 class _AppShell extends StatelessWidget {
-  final Widget child;
-  const _AppShell({required this.child});
+  final StatefulNavigationShell navigationShell;
+  const _AppShell({required this.navigationShell});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: child,
+      body: navigationShell,
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: navigationShell.currentIndex,
+        onTap: (index) => navigationShell.goBranch(
+          index,
+          initialLocation: index == navigationShell.currentIndex,
+        ),
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: const Color(0xFF1D4880),
+        unselectedItemColor: Colors.grey,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: 'Dashboard'),
+          BottomNavigationBarItem(icon: Icon(Icons.work), label: 'Magang'),
+          BottomNavigationBarItem(icon: Icon(Icons.analytics), label: 'MOORA'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profil'),
+        ],
+      ),
       floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 60.0, right: 0.0),
+        padding: const EdgeInsets.only(bottom: 0.0, right: 0.0),
         child: FloatingActionButton(
           heroTag: 'globalChatBtn',
           backgroundColor: const Color(0xFF1D4880),
@@ -41,11 +58,14 @@ class _AppShell extends StatelessWidget {
 class AppRouter {
   AppRouter._();
 
+  static final _rootNavigatorKey = GlobalKey<NavigatorState>();
+
   static final GoRouter router = GoRouter(
+    navigatorKey: _rootNavigatorKey,
     initialLocation: '/splash',
     redirect: _guard,
     routes: [
-      // Halaman publik (tanpa FAB chatbot)
+      // Halaman publik
       GoRoute(
         path: '/splash',
         builder: (_, __) => const SplashScreen(),
@@ -63,70 +83,102 @@ class AppRouter {
         builder: (_, __) => const ForgotPasswordScreen(),
       ),
 
-      // ShellRoute: semua halaman private dibungkus _AppShell yang punya FAB chatbot
-      ShellRoute(
-        builder: (_, __, child) => _AppShell(child: child),
-        routes: [
-          GoRoute(
-            path: '/home',
-            builder: (_, __) => const InternshipListScreen(),
+      // StatefulShellRoute untuk BottomNavigationBar
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) => _AppShell(navigationShell: navigationShell),
+        branches: [
+          // Branch 0: Dashboard
+          StatefulShellBranch(
             routes: [
               GoRoute(
-                path: 'internships/create',
-                builder: (_, __) => const InternshipFormScreen(),
-              ),
-              GoRoute(
-                path: 'internships/edit/:id',
-                builder: (_, state) => InternshipFormScreen(
-                  internshipId: int.parse(state.pathParameters['id']!),
-                ),
-              ),
-              GoRoute(
-                path: 'internships/:id',
-                builder: (_, state) => InternshipDetailScreen(
-                  id: int.parse(state.pathParameters['id']!),
-                ),
+                path: '/dashboard',
+                builder: (_, __) => const DashboardScreen(),
               ),
             ],
           ),
-          GoRoute(
-            path: '/moora/setup',
-            builder: (_, __) => const MooraSetupScreen(),
-          ),
-          GoRoute(
-            path: '/moora/scoring',
-            builder: (_, state) {
-              final extra = state.extra as Map<String, dynamic>?;
-              return MooraScoringScreen(setupData: extra);
-            },
-          ),
-          GoRoute(
-            path: '/moora/result',
-            builder: (_, state) {
-              final extra = state.extra as Map<String, dynamic>?;
-              return MooraResultScreen(resultData: extra);
-            },
-          ),
-          GoRoute(
-            path: '/profile',
-            builder: (_, __) => const ProfileScreen(),
+          // Branch 1: Magang
+          StatefulShellBranch(
             routes: [
               GoRoute(
-                path: 'edit',
-                builder: (_, __) => const EditProfileScreen(),
+                path: '/internships',
+                builder: (_, __) => const InternshipListScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'create',
+                    parentNavigatorKey: _rootNavigatorKey,
+                    builder: (_, __) => const InternshipFormScreen(),
+                  ),
+                  GoRoute(
+                    path: 'edit/:id',
+                    parentNavigatorKey: _rootNavigatorKey,
+                    builder: (_, state) => InternshipFormScreen(
+                      internshipId: int.parse(state.pathParameters['id']!),
+                    ),
+                  ),
+                  GoRoute(
+                    path: ':id',
+                    parentNavigatorKey: _rootNavigatorKey,
+                    builder: (_, state) => InternshipDetailScreen(
+                      id: int.parse(state.pathParameters['id']!),
+                    ),
+                  ),
+                ],
               ),
+            ],
+          ),
+          // Branch 2: MOORA
+          StatefulShellBranch(
+            routes: [
               GoRoute(
-                path: 'change-password',
-                builder: (_, __) => const ChangePasswordScreen(),
+                path: '/moora/setup',
+                builder: (_, __) => const MooraSetupScreen(),
+              ),
+            ],
+          ),
+          // Branch 3: Profil
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/profile',
+                builder: (_, __) => const ProfileScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'edit',
+                    parentNavigatorKey: _rootNavigatorKey,
+                    builder: (_, __) => const EditProfileScreen(),
+                  ),
+                  GoRoute(
+                    path: 'change-password',
+                    parentNavigatorKey: _rootNavigatorKey,
+                    builder: (_, __) => const ChangePasswordScreen(),
+                  ),
+                ],
               ),
             ],
           ),
         ],
       ),
 
-      // Halaman chat (di luar ShellRoute agar tampil full screen tanpa FAB ganda)
+      // Routes yang menutupi BottomNavBar (menggunakan root navigator)
+      GoRoute(
+        path: '/moora/scoring',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (_, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          return MooraScoringScreen(setupData: extra);
+        },
+      ),
+      GoRoute(
+        path: '/moora/result',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (_, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          return MooraResultScreen(resultData: extra);
+        },
+      ),
       GoRoute(
         path: '/chat',
+        parentNavigatorKey: _rootNavigatorKey,
         builder: (_, __) => const ChatScreen(),
       ),
     ],
@@ -139,7 +191,11 @@ class AppRouter {
     final hasToken = await SecureStorageService.hasToken();
 
     if (!hasToken && !isPublic) return '/login';
-    if (hasToken && isPublic && state.matchedLocation != '/splash') return '/home';
+    // Redirect ke dashboard sebagai ganti /home
+    if (hasToken && isPublic && state.matchedLocation != '/splash') return '/dashboard';
+    
+    // Redirect /home ke /internships jika ada yang masih mengarah ke sana
+    if (state.matchedLocation == '/home') return '/dashboard';
     return null;
   }
 }
