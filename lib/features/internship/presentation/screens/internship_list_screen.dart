@@ -35,6 +35,7 @@ class _InternshipListScreenState extends ConsumerState<InternshipListScreen> {
     ];
 
     return Scaffold(
+      floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
       appBar: _currentIndex == 0
           ? AppBar(
               title: const Text('Tempat Magang'),
