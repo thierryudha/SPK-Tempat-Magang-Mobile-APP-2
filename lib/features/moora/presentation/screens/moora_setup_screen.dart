@@ -128,7 +128,7 @@ class _MooraSetupScreenState extends ConsumerState<MooraSetupScreen> {
                       _SectionHeader(
                         title: 'Bobot Kriteria',
                         subtitle:
-                            'Total bobot harus 100% & silahkan geser slider ke kiri jika anda tidak ingin menggunakan kriteria tersebut.',
+                            'Total bobot harus 100% & Tekan toggle untuk aktif/menonaktifkan kriteria tersebut.',
                       ),
                       const SizedBox(height: 12),
 

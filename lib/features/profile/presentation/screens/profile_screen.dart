@@ -143,7 +143,7 @@ class ProfileScreen extends ConsumerWidget {
                           children: [
                             _InfoTile(
                               icon: Icons.person_outline,
-                              label: 'Nama Lengkap',
+                              label: 'Nama',
                               value: user.name,
                             ),
                             const Divider(height: 1),
