@@ -7,7 +7,7 @@ class CategoryModel {
   factory CategoryModel.fromJson(Map<String, dynamic> json) {
     return CategoryModel(
       id: json['id'] as int,
-      name: json['name'] as String,
+      name: json['name'] as String? ?? '',
     );
   }
 }
@@ -32,8 +32,8 @@ class InternshipModel {
   factory InternshipModel.fromJson(Map<String, dynamic> json) {
     return InternshipModel(
       id: json['id'] as int,
-      name: json['name'] as String,
-      city: json['city'] as String,
+      name: json['name'] as String? ?? '',
+      city: json['city'] as String? ?? '',
       categoryId: json['category_id'] as int?,
       description: json['description'] as String?,
       category: json['category'] != null
