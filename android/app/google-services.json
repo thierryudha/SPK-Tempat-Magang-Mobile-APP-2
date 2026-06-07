@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "915522367090",
+    "project_id": "moora-project-80bcf",
+    "storage_bucket": "moora-project-80bcf.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:915522367090:android:cdd6dc3868cfe14fd01ceb",
+        "android_client_info": {
+          "package_name": "com.example.finalproject"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCJPHwdb2omwmuDTYT53Q8H9mv0Kkm6NYk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
