@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:fl_chart/fl_chart.dart';
 
 import '../../../../core/constants/app_theme.dart';
 import '../../../../core/utils/shared_widgets.dart';
@@ -16,16 +15,16 @@ class DashboardScreen extends ConsumerWidget {
     final dashboardAsync = ref.watch(dashboardDataProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FB), // Very light gray/blue background
+      backgroundColor: AppColors.background, 
       appBar: AppBar(
-        title: const Text('Pusat Analitik Intelligence', 
-            style: TextStyle(fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
-        backgroundColor: Colors.transparent,
+        title: const Text('Dashboard', 
+            style: TextStyle(fontWeight: FontWeight.w700, color: Colors.white)),
+        backgroundColor: AppColors.primary,
         elevation: 0,
         centerTitle: false,
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh, color: AppColors.textSecondary),
+            icon: const Icon(Icons.refresh, color: Colors.white),
             onPressed: () => ref.invalidate(dashboardDataProvider),
           ),
         ],
@@ -45,10 +44,10 @@ class DashboardScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  _buildHeroCard(data.topRecommendation),
-                  const SizedBox(height: 16),
-                  _buildTop5Card(data.top5Companies),
-                  const SizedBox(height: 16),
+                  _buildGreeting(data.user.name),
+                  const SizedBox(height: 24),
+                  _buildInternshipListCard(data.top5Companies),
+                  const SizedBox(height: 24),
                   _buildStrategicInsightCard(data.summary, context),
                 ],
               ),
@@ -59,258 +58,221 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeroCard(DashboardTopCompanyModel? topWinner) {
-    final hasWinner = topWinner != null;
-
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.02),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      padding: const EdgeInsets.all(24),
+  Widget _buildGreeting(String name) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 4, bottom: 8),
       child: Row(
         children: [
-          // Left Side: Texts
           Expanded(
-            flex: 3,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFE8F0FE),
-                    borderRadius: BorderRadius.circular(20),
+                    color: const Color(0xFF1967D2).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Text(
-                    'ANALISIS PERSONAL',
+                    '🌟 WELCOME BACK',
                     style: TextStyle(
                       color: Color(0xFF1967D2),
                       fontSize: 10,
                       fontWeight: FontWeight.w800,
-                      letterSpacing: 0.5,
+                      letterSpacing: 1.0,
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
                 Text(
-                  hasWinner ? topWinner.name.toUpperCase() : 'BELUM ADA DATA',
+                  'Halo, $name!',
                   style: const TextStyle(
-                    fontSize: 24,
+                    fontSize: 26,
                     fontWeight: FontWeight.w900,
                     color: AppColors.textPrimary,
-                    height: 1.2,
+                    letterSpacing: -0.5,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  hasWinner
-                      ? 'Profil ini dirangkum berdasarkan preferensi bobot unik Anda terhadap kriteria penilaian.'
-                      : 'Jalankan program MOORA terlebih dahulu untuk mendapatkan analisis personal Anda.',
-                  style: const TextStyle(
-                    fontSize: 12,
+                const SizedBox(height: 4),
+                const Text(
+                  'Siap untuk menentukan jalur karir terbaikmu hari ini?',
+                  style: TextStyle(
+                    fontSize: 13,
                     color: AppColors.textSecondary,
-                    height: 1.5,
+                    height: 1.4,
                   ),
                 ),
-                const SizedBox(height: 20),
-                if (hasWinner)
-                  Row(
-                    children: [
-                      _buildMiniScoreCard('EVALUASI', '1', 'PERINGKAT'),
-                      const SizedBox(width: 12),
-                      _buildMiniScoreCard(
-                        'NILAI OPTIMASI',
-                        topWinner.optimizationValue.toStringAsFixed(3),
-                        'skor moora terbaik',
-                        isHighlight: true,
-                      ),
-                    ],
-                  ),
               ],
             ),
           ),
-          // Right Side: Radar Chart
-          if (hasWinner)
-            Expanded(
-              flex: 2,
-              child: SizedBox(
-                height: 150,
-                child: _buildRadarChart(),
-              ),
-            ),
         ],
       ),
     );
   }
 
-  Widget _buildMiniScoreCard(String title, String value, String subtitle, {bool isHighlight = false}) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: isHighlight ? const Color(0xFFE8F0FE) : Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: isHighlight ? Colors.transparent : const Color(0xFFF1F3F4)),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(title, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: isHighlight ? const Color(0xFF1967D2) : AppColors.textHint)),
-            const SizedBox(height: 4),
-            Text(value, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: isHighlight ? const Color(0xFF1967D2) : AppColors.textPrimary)),
-            const SizedBox(height: 2),
-            Text(subtitle, style: TextStyle(fontSize: 8, fontStyle: FontStyle.italic, color: isHighlight ? const Color(0xFF1967D2).withOpacity(0.7) : AppColors.textHint)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildRadarChart() {
-    return RadarChart(
-      RadarChartData(
-        dataSets: [
-          RadarDataSet(
-            fillColor: const Color(0xFF1967D2).withOpacity(0.2),
-            borderColor: const Color(0xFF1967D2),
-            entryRadius: 3,
-            dataEntries: [
-              const RadarEntry(value: 4.5),
-              const RadarEntry(value: 3.8),
-              const RadarEntry(value: 4.2),
-            ],
-            borderWidth: 2,
-          ),
-        ],
-        radarBackgroundColor: Colors.transparent,
-        borderData: FlBorderData(show: false),
-        radarBorderData: const BorderSide(color: Color(0xFFE0E0E0)),
-        getTitle: (index, angle) {
-          switch (index) {
-            case 0:
-              return const RadarChartTitle(text: 'Uang Saku', angle: 0);
-            case 1:
-              return const RadarChartTitle(text: 'Jam Kerja', angle: 0);
-            case 2:
-              return const RadarChartTitle(text: 'Jarak', angle: 0);
-            default:
-              return const RadarChartTitle(text: '');
-          }
-        },
-        titleTextStyle: const TextStyle(color: AppColors.textSecondary, fontSize: 8),
-        tickCount: 3,
-        ticksTextStyle: const TextStyle(color: Colors.transparent),
-        tickBorderData: const BorderSide(color: Color(0xFFF1F3F4)),
-        gridBorderData: const BorderSide(color: Color(0xFFF1F3F4)),
-      ),
-      swapAnimationDuration: const Duration(milliseconds: 150),
-      swapAnimationCurve: Curves.linear,
-    );
-  }
-
-  Widget _buildTop5Card(List<DashboardTopCompanyModel> companies) {
+  Widget _buildInternshipListCard(List<DashboardTopCompanyModel> companies) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Container(width: 4, height: 16, color: Colors.amber),
-              const SizedBox(width: 8),
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1D4880).withOpacity(0.08),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: const Icon(Icons.business_center_rounded, color: Color(0xFF1D4880), size: 24),
+              ),
+              const SizedBox(width: 16),
               const Expanded(
-                child: Text(
-                  'Top 5 Elite Companies',
-                  style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: AppColors.textPrimary),
-                  overflow: TextOverflow.ellipsis,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'List Internships',
+                      style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: AppColors.textPrimary),
+                    ),
+                    SizedBox(height: 2),
+                    Text(
+                      'Daftar magang terbaru Anda',
+                      style: TextStyle(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.w500),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 24),
           if (companies.isEmpty)
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 20),
-              child: Text('Belum ada data magang.', style: TextStyle(color: AppColors.textHint, fontSize: 12)),
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 40),
+                child: Column(
+                  children: [
+                    Icon(Icons.folder_open_rounded, size: 48, color: AppColors.textHint.withOpacity(0.5)),
+                    const SizedBox(height: 16),
+                    const Text('Belum ada data magang.', style: TextStyle(color: AppColors.textHint, fontSize: 14, fontWeight: FontWeight.w500)),
+                  ],
+                ),
+              ),
             )
           else
-            ...companies.map((c) => _buildCompanyItem(c)),
+            ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: companies.length,
+              separatorBuilder: (context, index) => Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Divider(height: 1, color: AppColors.textHint.withOpacity(0.1)),
+              ),
+              itemBuilder: (context, index) => _buildInternshipItem(companies[index], index),
+            ),
         ],
       ),
     );
   }
 
-  Widget _buildCompanyItem(DashboardTopCompanyModel company) {
+  Widget _buildInternshipItem(DashboardTopCompanyModel company, int index) {
+    final colors = [
+      const Color(0xFF1967D2),
+      const Color(0xFF34A853),
+      const Color(0xFFFBBC05),
+      const Color(0xFFEA4335),
+      const Color(0xFF8E24AA),
+    ];
+    final color = colors[index % colors.length];
+
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
         children: [
           Container(
-            width: 32,
-            height: 32,
+            width: 44,
+            height: 44,
             decoration: BoxDecoration(
-              color: const Color(0xFFF8F9FB),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: const Color(0xFFF1F3F4)),
+              gradient: LinearGradient(
+                colors: [color.withOpacity(0.7), color],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: color.withOpacity(0.25),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
             child: Center(
               child: Text(
-                '${company.rank}',
-                style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 12, color: AppColors.textSecondary),
+                company.name.isNotEmpty ? company.name.substring(0, 1).toUpperCase() : '?',
+                style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: Colors.white),
               ),
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   company.name,
-                  style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12, color: AppColors.textPrimary),
+                  style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: AppColors.textPrimary),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 8),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-            decoration: BoxDecoration(
-              color: Colors.amber.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: Row(
-              children: [
-                const Icon(Icons.star, color: Colors.amber, size: 12),
-                const SizedBox(width: 4),
-                Text(
-                  company.optimizationValue.toStringAsFixed(2),
-                  style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 10, color: Colors.amber),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    Icon(Icons.leaderboard_rounded, size: 14, color: AppColors.textHint.withOpacity(0.8)),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Rank: ${company.rank}',
+                      style: const TextStyle(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.w600),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
+          if (company.optimizationValue > 0)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: const Color(0xFFE8F0FE),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.star_rounded, color: Color(0xFF1967D2), size: 14),
+                  const SizedBox(width: 4),
+                  Text(
+                    company.optimizationValue.toStringAsFixed(2),
+                    style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: Color(0xFF1967D2)),
+                  ),
+                ],
+              ),
+            )
+          else
+            const Icon(Icons.chevron_right_rounded, color: AppColors.textHint),
         ],
       ),
     );

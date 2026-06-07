@@ -48,3 +48,5 @@ app.*.map.json
 lib/core/constants/api_secrets.dart
 lib/firebase_options.dart
 android/app/google-services.json
+
+refactor_dashboard.py

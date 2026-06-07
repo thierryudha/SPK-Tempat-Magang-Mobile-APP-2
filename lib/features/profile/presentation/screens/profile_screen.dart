@@ -68,7 +68,7 @@ class ProfileScreen extends ConsumerWidget {
                   padding: const EdgeInsets.fromLTRB(24, 32, 24, 32),
                   decoration: const BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [AppColors.primary, AppColors.primaryLight],
+                      colors: [AppColors.primaryLight, AppColors.primaryLight],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
