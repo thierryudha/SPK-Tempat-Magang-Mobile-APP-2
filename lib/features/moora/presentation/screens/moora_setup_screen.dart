@@ -212,8 +212,14 @@ class _MooraSetupScreenState extends ConsumerState<MooraSetupScreen> {
                   },
             backgroundColor:
                 canProceed ? AppColors.primary : AppColors.textHint,
-            icon: const Icon(Icons.arrow_forward),
-            label: Text('Lanjut Scoring (${selectedInternships.length})'),
+            icon: const Icon(Icons.arrow_forward, color: Colors.white),
+            label: Text(
+              'Lanjut Scoring (${selectedInternships.length})',
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           );
         },
       ),

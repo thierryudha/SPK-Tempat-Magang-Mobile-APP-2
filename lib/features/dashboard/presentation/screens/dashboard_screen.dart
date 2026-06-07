@@ -245,7 +245,7 @@ class DashboardScreen extends ConsumerWidget {
                     Icon(Icons.leaderboard_rounded, size: 14, color: AppColors.textHint.withOpacity(0.8)),
                     const SizedBox(width: 4),
                     Text(
-                      'Rank: ${company.rank}',
+                      'Internships ID: ${company.rank}',
                       style: const TextStyle(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.w600),
                     ),
                   ],
@@ -271,8 +271,7 @@ class DashboardScreen extends ConsumerWidget {
                 ],
               ),
             )
-          else
-            const Icon(Icons.chevron_right_rounded, color: AppColors.textHint),
+          
         ],
       ),
     );
@@ -321,17 +320,18 @@ class DashboardScreen extends ConsumerWidget {
               children: [
                 const Text(
                   'STRATEGIC INSIGHT',
-                  style: TextStyle(color: Colors.white70, fontSize: 9, fontWeight: FontWeight.w800, letterSpacing: 1),
+                  style: TextStyle(color: Colors.white70, fontSize: 14, fontWeight: FontWeight.w800, letterSpacing: 1),
                 ),
                 const SizedBox(height: 12),
                 const Text(
-                  'Siap Untuk Menentukan\nPilihan Terbaikmu?',
-                  style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w900, height: 1.2),
+                  '"Your work is going to fill a large part of your life, and the only way to be truly satisfied is to do what you believe is great work. And the only way to do great work is to love what you do. If you haven’t found it yet, keep looking. Don’t settle."',
+                  textAlign: TextAlign.justify,
+                  style: TextStyle(color: Colors.white70, fontSize: 15, fontStyle: FontStyle.italic, height: 1.4),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 6),
                 const Text(
-                  '"Kami siap membantu kamu mewujudkan jalur karir yang lebih baik!"',
-                  style: TextStyle(color: Colors.white70, fontSize: 10, fontStyle: FontStyle.italic, height: 1.4),
+                  '- Steve Jobs',
+                  style: TextStyle(color: Colors.white70, fontSize: 14, fontStyle: FontStyle.italic, height: 1.4),
                 ),
                 const SizedBox(height: 20),
                 
@@ -349,8 +349,8 @@ class DashboardScreen extends ConsumerWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('${summary.globalStats.totalGlobalCompanies}', style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900)),
-                            const Text('DATABASE', style: TextStyle(color: Colors.white70, fontSize: 8, fontWeight: FontWeight.w700)),
+                            Text('${summary.globalStats.totalGlobalCompanies}', style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w900)),
+                            const Text('GLOBAL', style: TextStyle(color: Colors.white70, fontSize: 10, fontWeight: FontWeight.w700)),
                           ],
                         ),
                       ),
@@ -360,8 +360,8 @@ class DashboardScreen extends ConsumerWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('${summary.myInternshipsCount}', style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900)),
-                            const Text('MY INTERNS', style: TextStyle(color: Colors.white70, fontSize: 8, fontWeight: FontWeight.w700)),
+                            Text('${summary.myInternshipsCount}', style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w900)),
+                            const Text('MY INTERNS', style: TextStyle(color: Colors.white70, fontSize: 10, fontWeight: FontWeight.w700)),
                           ],
                         ),
                       ),
