@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import '../../data/models/user_model.dart';
 import '../../data/repositories/auth_repository.dart';
 
@@ -27,6 +28,31 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
       rethrow;
     }
   }
+
+  Future<void> googleLogin() async {
+    state = const AsyncLoading();
+    try {
+      // API v7.x: gunakan GoogleSignIn.instance dan authenticate()
+      final googleUser = await GoogleSignIn.instance.authenticate();
+
+      if (googleUser == null) {
+        // User membatalkan login
+        state = const AsyncData(null);
+        return;
+      }
+
+      final user = await ref.read(authRepositoryProvider).googleLogin(
+            email: googleUser.email,
+            name: googleUser.displayName ?? googleUser.email,
+            googleId: googleUser.id,
+          );
+      state = AsyncData(user);
+    } catch (e, st) {
+      state = AsyncError(e, st);
+      rethrow;
+    }
+  }
+
 
   Future<void> register({
     required String name,

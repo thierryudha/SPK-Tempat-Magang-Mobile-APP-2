@@ -46,3 +46,4 @@ app.*.map.json
 
 # API Keys (jangan pernah di-commit!)
 lib/core/constants/api_secrets.dart
+lib/firebase_options.dart

@@ -15,6 +15,22 @@ class AuthRepository {
     return UserModel.fromJson(data['user'] as Map<String, dynamic>);
   }
 
+  Future<UserModel> googleLogin({
+    required String email,
+    required String name,
+    required String googleId,
+  }) async {
+    final data = await _dataSource.googleLogin(
+      email: email,
+      name: name,
+      googleId: googleId,
+    );
+    final token = data['token'] as String;
+    await SecureStorageService.saveToken(token);
+    return UserModel.fromJson(data['user'] as Map<String, dynamic>);
+  }
+
+
   Future<void> register({
     required String name,
     required String email,

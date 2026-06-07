@@ -7,6 +7,7 @@ class ApiConstants {
   static const String baseUrl = 'http://10.0.2.2:8000/api';
 
   static const String login = '/login';
+  static const String googleLogin = '/google-login';
   static const String register = '/register';
   static const String forgotPassword = '/forgot-password';
   static const String updateProfile = '/profile/update';

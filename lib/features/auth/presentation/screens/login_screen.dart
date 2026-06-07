@@ -18,6 +18,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _passwordCtrl = TextEditingController();
   bool _obscurePassword = true;
   bool _isLoading = false;
+  bool _isGoogleLoading = false;
   String? _errorMessage;
 
   @override
@@ -48,6 +49,25 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       setState(() => _errorMessage = 'Terjadi kesalahan. Coba lagi.');
     } finally {
       if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _signInWithGoogle() async {
+    setState(() {
+      _isGoogleLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      await ref.read(authProvider.notifier).googleLogin();
+
+      if (mounted) context.go('/home');
+    } on AppException catch (e) {
+      setState(() => _errorMessage = e.message);
+    } catch (e) {
+      setState(() => _errorMessage = 'Login dengan Google gagal. Coba lagi.');
+    } finally {
+      if (mounted) setState(() => _isGoogleLoading = false);
     }
   }
 
@@ -211,7 +231,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       SizedBox(
                         height: 50,
                         child: ElevatedButton(
-                          onPressed: _isLoading ? null : _submit,
+                          onPressed: (_isLoading || _isGoogleLoading) ? null : _submit,
                           child: _isLoading
                               ? const SizedBox(
                                   width: 20,
@@ -222,6 +242,74 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                   ),
                                 )
                               : const Text('Masuk'),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Divider "atau"
+                      Row(
+                        children: [
+                          const Expanded(child: Divider(thickness: 1)),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            child: Text(
+                              'atau',
+                              style: TextStyle(
+                                color: AppColors.textSecondary,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ),
+                          const Expanded(child: Divider(thickness: 1)),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Google Sign-In Button
+                      SizedBox(
+                        height: 50,
+                        child: OutlinedButton(
+                          onPressed: (_isLoading || _isGoogleLoading) ? null : _signInWithGoogle,
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: Color(0xFFDDDDDD), width: 1.5),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            backgroundColor: Colors.white,
+                          ),
+                          child: _isGoogleLoading
+                              ? const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: AppColors.primary,
+                                  ),
+                                )
+                              : Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Image.network(
+                                      'https://www.google.com/favicon.ico',
+                                      width: 20,
+                                      height: 20,
+                                      errorBuilder: (_, __, ___) => const Icon(
+                                        Icons.g_mobiledata,
+                                        size: 24,
+                                        color: Colors.red,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    const Text(
+                                      'Masuk dengan Google',
+                                      style: TextStyle(
+                                        color: Color(0xFF444444),
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                         ),
                       ),
                       const SizedBox(height: 24),

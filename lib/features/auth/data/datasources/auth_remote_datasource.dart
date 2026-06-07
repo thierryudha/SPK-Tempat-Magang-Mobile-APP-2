@@ -26,6 +26,28 @@ class AuthRemoteDataSource {
     }
   }
 
+  Future<Map<String, dynamic>> googleLogin({
+    required String email,
+    required String name,
+    required String googleId,
+  }) async {
+    try {
+      final response = await _dio.post(
+        ApiConstants.googleLogin,
+        data: {
+          'email': email,
+          'name': name,
+          'google_id': googleId,
+          'device_name': 'flutter_app',
+        },
+      );
+      return response.data as Map<String, dynamic>;
+    } on DioException catch (e) {
+      throw DioClient.extractException(e);
+    }
+  }
+
+
   Future<Map<String, dynamic>> register({
     required String name,
     required String email,
