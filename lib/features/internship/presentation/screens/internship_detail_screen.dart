@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/constants/app_theme.dart';
 import '../../../../core/utils/shared_widgets.dart';
 import '../providers/internship_provider.dart';
@@ -8,6 +9,41 @@ import '../providers/internship_provider.dart';
 class InternshipDetailScreen extends ConsumerWidget {
   final int id;
   const InternshipDetailScreen({super.key, required this.id});
+
+  Future<void> _launchURL(BuildContext context, String urlString) async {
+    if (urlString.isEmpty) return;
+
+    var uriString = urlString.trim();
+    if (!uriString.startsWith('http://') && !uriString.startsWith('https://')) {
+      uriString = 'https://$uriString';
+    }
+
+    final uri = Uri.tryParse(uriString);
+    if (uri != null) {
+      try {
+        final success = await launchUrl(uri, mode: LaunchMode.externalApplication);
+        if (!success) {
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Tidak dapat membuka link: $urlString')),
+            );
+          }
+        }
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error membuka link: $e')),
+          );
+        }
+      }
+    } else {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Format link tidak valid: $urlString')),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -92,10 +128,14 @@ class InternshipDetailScreen extends ConsumerWidget {
                       Row(
                         children: [
                           if (internship.websiteLink != null && internship.websiteLink!.isNotEmpty)
-                            _Badge(
-                              icon: Icons.language_outlined,
-                              label: 'Website',
-                              color: AppColors.primaryLight,
+                            InkWell(
+                              onTap: () => _launchURL(context, internship.websiteLink!),
+                              borderRadius: BorderRadius.circular(20),
+                              child: _Badge(
+                                icon: Icons.language_outlined,
+                                label: 'Website',
+                                color: AppColors.primaryLight,
+                              ),
                             ),
                           const SizedBox(width: 8),
                           if (internship.category != null)
@@ -124,9 +164,11 @@ class InternshipDetailScreen extends ConsumerWidget {
                             if (internship.websiteLink != null && internship.websiteLink!.isNotEmpty) ...[
                               const Divider(height: 1),
                               _InfoRow(
-                                  icon: Icons.language_outlined,
-                                  label: 'Website',
-                                  value: internship.websiteLink!),
+                                icon: Icons.language_outlined,
+                                label: 'Website',
+                                value: internship.websiteLink!,
+                                onTap: () => _launchURL(context, internship.websiteLink!),
+                              ),
                             ],
                             if (internship.category != null) ...[
                               const Divider(height: 1),
@@ -199,16 +241,33 @@ class _InfoRow extends StatelessWidget {
   final IconData icon;
   final String label;
   final String value;
+  final VoidCallback? onTap;
 
-  const _InfoRow({required this.icon, required this.label, required this.value});
+  const _InfoRow({
+    required this.icon,
+    required this.label,
+    required this.value,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    final textStyle = TextStyle(
+      color: onTap != null ? Colors.blue : AppColors.textPrimary,
+      fontSize: 14,
+      fontWeight: FontWeight.w500,
+      decoration: onTap != null ? TextDecoration.underline : null,
+    );
+
+    final rowContent = Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
         children: [
-          Icon(icon, size: 18, color: AppColors.textSecondary),
+          Icon(
+            icon,
+            size: 18,
+            color: onTap != null ? Colors.blue : AppColors.textSecondary,
+          ),
           const SizedBox(width: 12),
           SizedBox(
             width: 80,
@@ -220,15 +279,26 @@ class _InfoRow extends StatelessWidget {
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(
-                color: AppColors.textPrimary,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
+              style: textStyle,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
+          if (onTap != null) ...[
+            const SizedBox(width: 4),
+            const Icon(Icons.open_in_new, size: 16, color: Colors.blue),
+          ],
         ],
       ),
     );
+
+    if (onTap != null) {
+      return InkWell(
+        onTap: onTap,
+        child: rowContent,
+      );
+    }
+
+    return rowContent;
   }
 }
