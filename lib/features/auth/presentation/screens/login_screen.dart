@@ -327,6 +327,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ),
                           TextButton(
                             onPressed: () => context.push('/register'),
+                            style: TextButton.styleFrom(
+                              padding: const EdgeInsets.only(left: 4, right: 4),
+                              minimumSize: Size.zero,
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            ),
                             child: const Text(
                               'Daftar',
                               style: TextStyle(
