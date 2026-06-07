@@ -25,7 +25,7 @@ class _AppShell extends StatelessWidget {
     return Scaffold(
       body: child,
       floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 70.0),
+        padding: const EdgeInsets.only(bottom: 70.0, right: 14.0),
         child: FloatingActionButton(
           heroTag: 'globalChatBtn',
           backgroundColor: const Color(0xFF1D4880),

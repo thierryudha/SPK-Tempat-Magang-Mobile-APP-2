@@ -57,7 +57,7 @@ class DioClient {
         final data = error.response?.data;
         if (statusCode == 401) return const UnauthorizedException();
         if (statusCode == 422) {
-          final message = data?['message'] ?? 'Validasi gagal.';
+          final message = data?['message'] ?? 'Data sudah terdaftar.';
           final errors = data?['errors'];
           return ValidationException(message: message, errors: errors);
         }

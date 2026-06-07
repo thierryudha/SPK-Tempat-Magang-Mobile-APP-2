@@ -193,6 +193,7 @@ class _MooraSetupScreenState extends ConsumerState<MooraSetupScreen> {
         },
       ),
 
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: criteriasAsync.whenOrNull(
         data: (_) {
           final isWeightValid =

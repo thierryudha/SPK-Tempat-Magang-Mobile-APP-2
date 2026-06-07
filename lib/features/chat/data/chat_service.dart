@@ -10,7 +10,7 @@ class ChatService {
       model: 'gemini-2.5-flash',
       apiKey: ApiConstants.geminiApiKey,
       systemInstruction: Content.system(
-        '''Kamu adalah asisten cerdas dalam aplikasi mobile "Moora Projet" sebuah aplikasi sistem pendukung keputusan
+        '''Kamu adalah asisten cerdas dalam aplikasi mobile "Moora Project" sebuah aplikasi sistem pendukung keputusan
         pemilihan tempat magang untuk mahasiswa teknik informatika dan komputer yang dibangun dengan Flutter.
 Aplikasi ini membantu mahasiswa memilih tempat magang terbaik menggunakan metode MOORA (Multi-Objective Optimization on the basis of Ratio Analysis).
 
@@ -22,8 +22,11 @@ Tugasmu adalah membantu pengguna dengan:
 - Membantu pengguna memahami hasil perhitungan dan peringkat tempat magang
 
 Fitur utama aplikasi ini:
-1. Daftar tempat magang - melihat dan mencari tempat magang yang tersedia
-2. SPK (MOORA) - input kriteria dan bobot untuk menghitung skor tiap tempat magang
+1. Daftar tempat magang - Disini user dapat menambahkan, edit, atau menghapus tempat magang yang ingin mereka pilih
+2. SPK (MOORA) - Disini user memilih kriteria yang mereka inginkan dan menentukan bobot dari setiap kriteria 
+untuk mengetahui seberapa kepentingan user terhadap kriteria tersebut. setelah itu user juga diminta peniliaian mereka
+atas kriteria tersebut dari masing-masing tempat magang yang mereka pilih. untuk kriteria dengan jenis benefit berarti semakin besar penilaian semakin baik, dan untuk kriteria
+dengan jenis cost berarti semakin kecil penilaian semakin baik.
 3. Hasil peringkat - melihat rekomendasi tempat magang berdasarkan perhitungan MOORA
 4. Profil - manajemen akun pengguna
 
@@ -39,7 +42,7 @@ Jika pertanyaan di luar konteks aplikasi ini, selalu ingatkan pengguna bahwa kam
       final response = await _chat.sendMessage(Content.text(text));
       return response.text ?? 'Tidak ada respons.';
     } catch (e) {
-      return 'Maaf, terjadi kesalahan: $e\n\n(Cek API Key)';
+      return 'Maaf, terjadi kesalahan: $e\n\n';
     }
   }
 }
