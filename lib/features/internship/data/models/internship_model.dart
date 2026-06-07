@@ -15,17 +15,15 @@ class CategoryModel {
 class InternshipModel {
   final int id;
   final String name;
-  final String city;
+  final String? websiteLink;
   final int? categoryId;
-  final String? description;
   final CategoryModel? category;
 
   const InternshipModel({
     required this.id,
     required this.name,
-    required this.city,
+    this.websiteLink,
     this.categoryId,
-    this.description,
     this.category,
   });
 
@@ -33,9 +31,8 @@ class InternshipModel {
     return InternshipModel(
       id: json['id'] as int,
       name: json['name'] as String? ?? '',
-      city: json['city'] as String? ?? '',
+      websiteLink: json['website_link'] as String?,
       categoryId: json['category_id'] as int?,
-      description: json['description'] as String?,
       category: json['category'] != null
           ? CategoryModel.fromJson(json['category'] as Map<String, dynamic>)
           : null,

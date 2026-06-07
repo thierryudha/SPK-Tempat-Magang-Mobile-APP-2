@@ -14,6 +14,7 @@ class ApiConstants {
   static const String changePassword = '/profile/change-password';
   static const String logout = '/logout';
   static const String me = '/me';
+  static const String categories = '/categories';
   static const String internships = '/internships';
   static const String criterias = '/criterias';
   static const String weights = '/weights';

@@ -173,7 +173,7 @@ class _MooraSetupScreenState extends ConsumerState<MooraSetupScreen> {
                           children: internships
                               .map((i) => _InternshipCheckCard(
                                     name: i.name,
-                                    city: i.city,
+                                    city: i.websiteLink ?? 'Tidak ada link',
                                     category: i.category?.name,
                                     isSelected:
                                         selectedNotifier.isSelected(i.id),

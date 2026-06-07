@@ -6,6 +6,7 @@ import '../../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../../features/auth/presentation/screens/splash_screen.dart';
 import '../../features/internship/presentation/screens/internship_list_screen.dart';
 import '../../features/internship/presentation/screens/internship_detail_screen.dart';
+import '../../features/internship/presentation/screens/internship_form_screen.dart';
 import '../../features/moora/presentation/screens/moora_setup_screen.dart';
 import '../../features/moora/presentation/screens/moora_scoring_screen.dart';
 import '../../features/moora/presentation/screens/moora_result_screen.dart';
@@ -70,6 +71,16 @@ class AppRouter {
             path: '/home',
             builder: (_, __) => const InternshipListScreen(),
             routes: [
+              GoRoute(
+                path: 'internships/create',
+                builder: (_, __) => const InternshipFormScreen(),
+              ),
+              GoRoute(
+                path: 'internships/edit/:id',
+                builder: (_, state) => InternshipFormScreen(
+                  internshipId: int.parse(state.pathParameters['id']!),
+                ),
+              ),
               GoRoute(
                 path: 'internships/:id',
                 builder: (_, state) => InternshipDetailScreen(

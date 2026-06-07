@@ -53,14 +53,21 @@ class InternshipCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        const Icon(Icons.location_on_outlined,
-                            size: 13, color: AppColors.textSecondary),
-                        const SizedBox(width: 3),
-                        Text(
-                          internship.city,
-                          style: const TextStyle(
-                              fontSize: 12, color: AppColors.textSecondary),
-                        ),
+                        if (internship.websiteLink != null && internship.websiteLink!.isNotEmpty) ...[
+                          const Icon(Icons.language_outlined,
+                              size: 13, color: AppColors.textSecondary),
+                          const SizedBox(width: 3),
+                          Expanded(
+                            child: Text(
+                              internship.websiteLink!,
+                              style: const TextStyle(
+                                  fontSize: 12, color: AppColors.textSecondary),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                        ],
                         if (internship.category != null) ...[
                           const SizedBox(width: 10),
                           Container(

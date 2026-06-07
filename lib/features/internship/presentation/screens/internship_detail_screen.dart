@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_theme.dart';
 import '../../../../core/utils/shared_widgets.dart';
 import '../providers/internship_provider.dart';
@@ -28,6 +29,38 @@ class InternshipDetailScreen extends ConsumerWidget {
               SliverAppBar(
                 expandedHeight: 180,
                 pinned: true,
+                actions: [
+                  IconButton(
+                    icon: const Icon(Icons.edit, color: Colors.white),
+                    onPressed: () => context.go('/home/internships/edit/${internship.id}'),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.white),
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          title: const Text('Hapus Data'),
+                          content: const Text('Yakin ingin menghapus tempat magang ini?'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(ctx),
+                              child: const Text('Batal'),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(ctx);
+                                ref.read(internshipActionProvider.notifier).deleteInternship(internship.id);
+                                context.pop();
+                              },
+                              child: const Text('Hapus', style: TextStyle(color: Colors.red)),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ],
                 flexibleSpace: FlexibleSpaceBar(
                   title: Text(
                     internship.name,
@@ -58,11 +91,12 @@ class InternshipDetailScreen extends ConsumerWidget {
                       // Badges
                       Row(
                         children: [
-                          _Badge(
-                            icon: Icons.location_on_outlined,
-                            label: internship.city,
-                            color: AppColors.primaryLight,
-                          ),
+                          if (internship.websiteLink != null && internship.websiteLink!.isNotEmpty)
+                            _Badge(
+                              icon: Icons.language_outlined,
+                              label: 'Website',
+                              color: AppColors.primaryLight,
+                            ),
                           const SizedBox(width: 8),
                           if (internship.category != null)
                             _Badge(
@@ -74,24 +108,7 @@ class InternshipDetailScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 20),
 
-                      // Deskripsi
-                      _SectionTitle(title: 'Tentang Tempat Magang'),
-                      const SizedBox(height: 8),
-                      Card(
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Text(
-                            internship.description?.isNotEmpty == true
-                                ? internship.description!
-                                : 'Belum ada deskripsi untuk tempat magang ini.',
-                            style: const TextStyle(
-                              color: AppColors.textSecondary,
-                              fontSize: 14,
-                              height: 1.6,
-                            ),
-                          ),
-                        ),
-                      ),
+                      // Tidak ada deskripsi di backend, bisa dihilangkan
                       const SizedBox(height: 20),
 
                       // Info detail
@@ -104,11 +121,13 @@ class InternshipDetailScreen extends ConsumerWidget {
                                 icon: Icons.business_outlined,
                                 label: 'Nama',
                                 value: internship.name),
-                            const Divider(height: 1),
-                            _InfoRow(
-                                icon: Icons.location_city_outlined,
-                                label: 'Kota',
-                                value: internship.city),
+                            if (internship.websiteLink != null && internship.websiteLink!.isNotEmpty) ...[
+                              const Divider(height: 1),
+                              _InfoRow(
+                                  icon: Icons.language_outlined,
+                                  label: 'Website',
+                                  value: internship.websiteLink!),
+                            ],
                             if (internship.category != null) ...[
                               const Divider(height: 1),
                               _InfoRow(

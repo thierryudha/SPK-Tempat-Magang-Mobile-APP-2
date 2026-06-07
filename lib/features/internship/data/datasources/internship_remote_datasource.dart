@@ -28,4 +28,45 @@ class InternshipRemoteDataSource {
       throw DioClient.extractException(e);
     }
   }
+
+  Future<List<CategoryModel>> getCategories() async {
+    try {
+      final response = await _dio.get(ApiConstants.categories);
+      final data = response.data as Map<String, dynamic>;
+      final list = data['data'] as List<dynamic>;
+      return list
+          .map((e) => CategoryModel.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } on DioException catch (e) {
+      throw DioClient.extractException(e);
+    }
+  }
+
+  Future<InternshipModel> createInternship(Map<String, dynamic> data) async {
+    try {
+      final response = await _dio.post(ApiConstants.internships, data: data);
+      final responseData = response.data as Map<String, dynamic>;
+      return InternshipModel.fromJson(responseData['data'] as Map<String, dynamic>);
+    } on DioException catch (e) {
+      throw DioClient.extractException(e);
+    }
+  }
+
+  Future<InternshipModel> updateInternship(int id, Map<String, dynamic> data) async {
+    try {
+      final response = await _dio.put('${ApiConstants.internships}/$id', data: data);
+      final responseData = response.data as Map<String, dynamic>;
+      return InternshipModel.fromJson(responseData['data'] as Map<String, dynamic>);
+    } on DioException catch (e) {
+      throw DioClient.extractException(e);
+    }
+  }
+
+  Future<void> deleteInternship(int id) async {
+    try {
+      await _dio.delete('${ApiConstants.internships}/$id');
+    } on DioException catch (e) {
+      throw DioClient.extractException(e);
+    }
+  }
 }

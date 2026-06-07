@@ -116,7 +116,7 @@ class _MooraScoringScreenState extends ConsumerState<MooraScoringScreen> {
                     return _InternshipScoringCard(
                       internshipId: internship.id.toString(),
                       internshipName: internship.name,
-                      internshipCity: internship.city,
+                      internshipCity: internship.websiteLink ?? 'Tidak ada link',
                       criterias: criterias,
                       scores: scores[internship.id.toString()] ?? {},
                       onScoreChanged: (criteriaId, score) {

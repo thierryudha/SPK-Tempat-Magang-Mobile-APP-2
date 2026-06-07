@@ -71,6 +71,13 @@ class _InternshipListScreenState extends ConsumerState<InternshipListScreen> {
             )
           : null,
       body: screens[_currentIndex],
+      floatingActionButton: _currentIndex == 0
+          ? FloatingActionButton(
+              onPressed: () => context.go('/home/internships/create'),
+              backgroundColor: AppColors.primary,
+              child: const Icon(Icons.add, color: Colors.white),
+            )
+          : null,
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (i) => setState(() => _currentIndex = i),
@@ -115,8 +122,7 @@ class _InternshipTab extends ConsumerWidget {
             ? internships
             : internships
                 .where((i) =>
-                    i.name.toLowerCase().contains(searchQuery.toLowerCase()) ||
-                    i.city.toLowerCase().contains(searchQuery.toLowerCase()))
+                    i.name.toLowerCase().contains(searchQuery.toLowerCase()))
                 .toList();
 
         if (filtered.isEmpty) {
